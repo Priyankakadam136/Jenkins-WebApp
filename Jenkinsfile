@@ -45,9 +45,21 @@ pipeline{
         }
         stage("Deploy"){
             steps{
-                sh'''
-                docker run -d -p 80:80 ${IMAGE_NAME}:${IMAGE_TAG}
-                '''
+                // sh'''
+                // docker run -d -p 80:80 ${IMAGE_NAME}:${IMAGE_TAG}
+                // '''
+                sh '''
+            set -e
+
+            docker stop webapp || true
+            docker rm webapp || true
+
+            docker run -d \
+              --name webapp \
+              --restart unless-stopped \
+              -p 80:80 \
+              ${IMAGE_NAME}:${IMAGE_TAG}
+        '''
             }
         }
     }
