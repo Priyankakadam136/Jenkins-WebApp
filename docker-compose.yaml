@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+
+   webapp:
+    build: .
+    container_name: webapp
+    networks:
+      - mynet
+    ports:
+      - "80:80" 
+    environment:
+      - MONGO_URI=mongodb://mongodb:27107/mydb
+    depends_on:
+      - database     
+
+
+   database:
+    image: mongo:6.0
+    container_name: mongodb
+    restart: always
+    networks:
+      - mynet
+    volumes:
+      - mydata:/data/db
+    ports:
+      - "27017:27017"  
+
+networks:
+  mynet:
+volumes:
+  mydata:  
+

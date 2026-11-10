@@ -1,122 +1,100 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+
+import { useState, useEffect } from "react";
+import Navbar from "./components/Navbar";
+import SummaryCards from "./components/SummaryCards";
+import ExpenseForm from "./components/ExpenseForm";
+import ExpenseList from "./components/ExpenseList";
+import "./App.css";
+
+const initialExpenses = [
+  {
+    id: 1,
+    title: "Grocery Shopping",
+    category: "Food",
+    date: "2026-11-08",
+    amount: 1500,
+  },
+  {
+    id: 2,
+    title: "Electricity Bill",
+    category: "Bills",
+    date: "2026-11-07",
+    amount: 2000,
+  },
+  {
+    id: 3,
+    title: "Movie Tickets",
+    category: "Entertainment",
+    date: "2026-11-06",
+    amount: 500,
+  },
+];
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [expenses, setExpenses] = useState(() => {
+    try {
+      const savedExpenses = localStorage.getItem("expenses");
+      return savedExpenses
+        ? JSON.parse(savedExpenses)
+        : initialExpenses;
+    } catch {
+      return initialExpenses;
+    }
+  });
+
+  const totalIncome = 25000;
+
+  const totalExpenses = expenses.reduce(
+    (total, expense) => total + expense.amount,
+    0
+  );
+
+  const balance = totalIncome - totalExpenses;
+
+  useEffect(() => {
+    localStorage.setItem("expenses", JSON.stringify(expenses));
+  }, [expenses]);
+
+  const addExpense = (newExpense) => {
+    setExpenses((prevExpenses) => [
+      newExpense,
+      ...prevExpenses,
+    ]);
+  };
+
+  const deleteExpense = (id) => {
+    setExpenses((prevExpenses) =>
+      prevExpenses.filter((expense) => expense.id !== id)
+    );
+  };
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started! Welcome here!!</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR v.1</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <div className="app">
+      <Navbar />
 
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
+      <main className="dashboard">
+        <div className="dashboard-header">
+          <h1>Dashboard</h1>
+          <p>Track your income and expenses in one place.</p>
         </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+        <SummaryCards
+          totalIncome={totalIncome}
+          totalExpenses={totalExpenses}
+          balance={balance}
+        />
+
+        <div className="content-grid">
+          <ExpenseForm onAddExpense={addExpense} />
+
+          <ExpenseList
+            expenses={expenses}
+            onDeleteExpense={deleteExpense}
+          />
+        </div>
+      </main>
+    </div>
+  );
 }
 
-export default App
+export default App;
