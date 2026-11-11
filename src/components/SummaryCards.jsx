@@ -45,4 +45,3 @@ function SummaryCards({ totalIncome, totalExpenses, balance }) {
 }
 
 export default SummaryCards;
-
